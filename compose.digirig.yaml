@@ -1,0 +1,19 @@
+# Overlay that passes a Digirig (USB sound card + CP210x serial) into the
+# container. Use together with compose.yaml:
+#
+#   podman compose -f compose.yaml -f compose.digirig.yaml up -d
+#
+# Plug the Digirig in BEFORE starting: podman fails to start the container if a
+# listed device is missing. Serial path is usually /dev/ttyUSB0; override with
+#   DIGIRIG_SERIAL=/dev/ttyUSB1 podman compose -f ... up -d
+# (/dev/serial/by-id/usb-Silicon_Labs_CP2102_... is stable across reboots.)
+services:
+  graywolf:
+    devices:
+      - /dev/snd:/dev/snd                                   # Digirig audio (ALSA)
+      - ${DIGIRIG_SERIAL:-/dev/ttyUSB0}:${DIGIRIG_SERIAL:-/dev/ttyUSB0}  # PTT via RTS/DTR
+    # Rootless podman: keep the host user's supplementary groups (audio,
+    # dialout) so the unprivileged container user can open the device nodes.
+    # The host user must be in those groups: sudo usermod -aG audio,dialout $USER
+    group_add:
+      - keep-groups

@@ -1,0 +1,49 @@
+---
+title: "Building and running"
+---
+
+## Image
+
+The `Containerfile` downloads the official graywolf release tarball for the
+target architecture (`amd64` or `arm64`, e.g. Raspberry Pi 5), verifies its
+SHA-256 against the release `checksums.txt`, and installs it on
+`debian:trixie-slim`. The version is the `GRAYWOLF_VERSION` build arg
+(default `0.14.14`, also set in `compose.yaml`).
+
+State (config DB, packet history, map tiles) lives in `./graywolf-data/`
+(bind-mounted at `/data` with `:U` so podman chowns it to the container user).
+It is git-ignored; back it up to keep your station config. The web UI listens on port 8080.
+
+## Running without a radio (APRS-IS only)
+
+```bash
+podman compose up -d --build
+```
+
+Then browse to <http://localhost:8080>.
+
+## Running with a Digirig
+
+```bash
+podman compose -f compose.yaml -f compose.digirig.yaml up -d --build
+```
+
+`compose.digirig.yaml` passes `/dev/snd` (Digirig audio) and the CP210x serial
+port (PTT via RTS/DTR) into the container. Plug the Digirig in first; a missing
+device stops the container from starting.
+
+- Serial port other than `/dev/ttyUSB0`:
+  `DIGIRIG_SERIAL=/dev/ttyUSB1 podman compose -f compose.yaml -f compose.digirig.yaml up -d`
+- Rootless podman needs your host user in the `audio` and `dialout` groups
+  (`sudo usermod -aG audio,dialout $USER`, then log in again). The overlay uses
+  `group_add: keep-groups` so the container user inherits them.
+- In the graywolf UI, select the Digirig sound device and serial PTT (RTS).
+
+## Building for another architecture
+
+```bash
+podman build --platform linux/arm64 -t graywolf:arm64 .
+```
+
+This needs QEMU binfmt emulation on the build host; on the Pi itself a plain
+`podman compose build` builds natively.

@@ -1,0 +1,21 @@
+# Base graywolf service: web UI + APRS-IS, no radio hardware required.
+#
+#   podman compose up -d --build
+#
+# For a Digirig, layer compose.digirig.yaml on top (see that file).
+services:
+  graywolf:
+    image: localhost/graywolf:latest
+    build:
+      context: .
+      dockerfile: Containerfile
+      args:
+        GRAYWOLF_VERSION: "0.14.14"
+    container_name: graywolf
+    restart: unless-stopped
+    ports:
+      - "8080:8080"        # web UI / API
+    volumes:
+      - ./graywolf-data:/data:U   # config/history DBs live here; :U chowns to the container user
+    environment:
+      TZ: UTC
