@@ -3,6 +3,12 @@
 #
 #   podman compose -f compose.yaml -f compose.digirig.yaml up -d
 #
+# Needs the python `podman-compose` provider, NOT docker-compose: the latter
+# goes through podman's Docker API, which treats `keep-groups` as a literal
+# group name and fails ("Unable to find group keep-groups"). Select it with
+#   export PODMAN_COMPOSE_PROVIDER=/usr/bin/podman-compose
+# or set compose_providers in ~/.config/containers/containers.conf.
+#
 # Plug the Digirig in BEFORE starting: podman fails to start the container if a
 # listed device is missing. Serial path is usually /dev/ttyUSB0; override with
 #   DIGIRIG_SERIAL=/dev/ttyUSB1 podman compose -f ... up -d
