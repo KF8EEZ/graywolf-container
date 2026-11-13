@@ -32,6 +32,17 @@ podman compose -f compose.yaml -f compose.digirig.yaml up -d --build
 port (PTT via RTS/DTR) into the container. Plug the Digirig in first; a missing
 device stops the container from starting.
 
+- **Use the `podman-compose` provider.** If `podman compose` hands off to
+  `docker-compose`, startup fails with `Unable to find group keep-groups`,
+  because `docker-compose` goes through podman's Docker API, which treats
+  `keep-groups` as a literal group name. Select the right provider with
+  `export PODMAN_COMPOSE_PROVIDER=/usr/bin/podman-compose`, or permanently:
+
+  ```toml
+  # ~/.config/containers/containers.conf
+  [engine]
+  compose_providers = ["/usr/bin/podman-compose"]
+  ```
 - Serial port other than `/dev/ttyUSB0`:
   `DIGIRIG_SERIAL=/dev/ttyUSB1 podman compose -f compose.yaml -f compose.digirig.yaml up -d`
 - Rootless podman needs your host user in the `audio` and `dialout` groups
