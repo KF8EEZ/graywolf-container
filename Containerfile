@@ -35,7 +35,9 @@ ARG GRAYWOLF_VERSION=0.14.14
 LABEL org.opencontainers.image.title="graywolf" \
       org.opencontainers.image.description="Graywolf APRS TNC / digipeater / iGate" \
       org.opencontainers.image.version="${GRAYWOLF_VERSION}" \
-      org.opencontainers.image.source="https://github.com/chrissnell/graywolf"
+      org.opencontainers.image.source="https://github.com/KF8EEZ/graywolf-container" \
+      org.opencontainers.image.documentation="https://KF8EEZ.github.io/graywolf-container/" \
+      org.opencontainers.image.url="https://github.com/chrissnell/graywolf"
 
 # libasound2: sound card access (Digirig audio). No other runtime deps needed.
 RUN apt-get update \

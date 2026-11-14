@@ -26,6 +26,8 @@ install.
   - **With a Digirig.** A [Digirig](https://digirig.net) USB interface is
     passed into the container: its sound card for audio and its serial port for
     PTT (push-to-talk) via RTS/DTR.
+- **Published images.** Multi-arch images are published to `ghcr.io` with
+  date-based tags such as `2026-11-14-01`; see [Releases](releases.qmd).
 - **Saved run rules.** Compose files capture the ports, volume and device
   passthrough, so nothing has to be remembered or retyped.
 - **Persistent data.** Configuration and packet history are kept in
@@ -36,12 +38,13 @@ install.
 |------------------------|-------------------------------------------------|
 | `Containerfile`        | Builds the image for amd64 or arm64             |
 | `compose.yaml`         | Base service: web UI on port 8080, no radio     |
+| `compose.build.yaml`   | Overlay: build locally instead of pulling       |
 | `compose.digirig.yaml` | Overlay adding Digirig audio and serial devices |
 
 ## Quick start
 
 ```bash
-podman compose up -d --build        # no radio, APRS-IS only
+podman compose up -d        # no radio, APRS-IS only
 ```
 
 Then open <http://localhost:8080> to configure graywolf.

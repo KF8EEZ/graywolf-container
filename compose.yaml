@@ -1,16 +1,16 @@
 # Base graywolf service: web UI + APRS-IS, no radio hardware required.
+# Pulls the published multi-arch image (amd64 / arm64 picked automatically).
 #
-#   podman compose up -d --build
+#   podman compose up -d
 #
 # For a Digirig, layer compose.digirig.yaml on top (see that file).
+# To build locally instead of pulling, layer compose.build.yaml.
+#
+# Pin a specific release with GRAYWOLF_TAG, e.g. 2026-11-14-01 or gw-0.14.14:
+#   GRAYWOLF_TAG=2026-11-14-01 podman compose up -d
 services:
   graywolf:
-    image: localhost/graywolf:latest
-    build:
-      context: .
-      dockerfile: Containerfile
-      args:
-        GRAYWOLF_VERSION: "0.14.14"
+    image: ghcr.io/kf8eez/graywolf-container:${GRAYWOLF_TAG:-latest}
     container_name: graywolf
     restart: unless-stopped
     ports:

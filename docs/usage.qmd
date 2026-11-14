@@ -4,6 +4,11 @@ title: "Building and running"
 
 ## Image
 
+`compose.yaml` pulls the published multi-arch image
+`ghcr.io/kf8eez/graywolf-container:latest` (see [Releases](releases.qmd)); podman
+picks the `amd64` or `arm64` build for the host. The sections below describe how
+that image is built.
+
 The `Containerfile` downloads the official graywolf release tarball for the
 target architecture (`amd64` or `arm64`, e.g. Raspberry Pi 5), verifies its
 SHA-256 against the release `checksums.txt`, and installs it on
@@ -17,7 +22,7 @@ It is git-ignored; back it up to keep your station config. The web UI listens on
 ## Running without a radio (APRS-IS only)
 
 ```bash
-podman compose up -d --build
+podman compose up -d
 ```
 
 Then browse to <http://localhost:8080>.
@@ -25,7 +30,7 @@ Then browse to <http://localhost:8080>.
 ## Running with a Digirig
 
 ```bash
-podman compose -f compose.yaml -f compose.digirig.yaml up -d --build
+podman compose -f compose.yaml -f compose.digirig.yaml up -d
 ```
 
 `compose.digirig.yaml` passes `/dev/snd` (Digirig audio) and the CP210x serial
@@ -50,11 +55,15 @@ device stops the container from starting.
   `group_add: keep-groups` so the container user inherits them.
 - In the graywolf UI, select the Digirig sound device and serial PTT (RTS).
 
-## Building for another architecture
+## Building locally instead of pulling
+
+Layer `compose.build.yaml` to build the image from the `Containerfile`:
 
 ```bash
-podman build --platform linux/arm64 -t graywolf:arm64 .
+podman compose -f compose.yaml -f compose.build.yaml up -d --build
 ```
 
-This needs QEMU binfmt emulation on the build host; on the Pi itself a plain
-`podman compose build` builds natively.
+Add `-f compose.digirig.yaml` for a Digirig. This builds natively for the
+machine it runs on (amd64 or arm64). Cross-building another architecture needs
+QEMU binfmt emulation, so published releases are built on each architecture's
+own hardware instead.

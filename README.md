@@ -16,13 +16,30 @@ and its serial port.
 ## Quick start
 
 ```bash
-podman compose up -d --build                                          # no radio
-podman compose -f compose.yaml -f compose.digirig.yaml up -d --build  # Digirig
+podman compose up -d                                          # no radio
+podman compose -f compose.yaml -f compose.digirig.yaml up -d  # Digirig
 ```
+
+This pulls the published image `ghcr.io/kf8eez/graywolf-container` (amd64 and
+arm64). To build locally instead, add `-f compose.build.yaml` and `--build`.
 
 The web UI is at <http://localhost:8080>. See the
 [documentation](https://KF8EEZ.github.io/graywolf-container/) for Digirig
 setup, host group requirements and troubleshooting.
+
+## Publishing container images
+
+Images are tagged `YYYY-MM-DD-NN` (serial per day), built natively on each
+architecture and combined into a multi-arch manifest with `scripts/publish.sh`:
+
+```bash
+scripts/publish.sh amd64                  # on the PC; prints the tag it chose
+scripts/publish.sh arm64 2026-11-14-01    # on the Pi 5, same tag
+scripts/publish.sh manifest 2026-11-14-01 # publishes the tag, latest, gw-<version>
+```
+
+See [Releases](https://KF8EEZ.github.io/graywolf-container/releases.html) for
+the tag scheme, login and first-publish steps.
 
 ## Publishing the documentation
 

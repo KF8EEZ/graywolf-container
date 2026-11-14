@@ -1,0 +1,80 @@
+---
+title: "Releases"
+---
+
+Images are published to the GitHub Container Registry as
+`ghcr.io/kf8eez/graywolf-container` (GHCR requires a lowercase name). Releases
+are made with `scripts/publish.sh`.
+
+## Tags
+
+A release is named `YYYY-MM-DD-NN`, where `NN` is a serial number for that day
+(`01`, `02`, ...), so several releases on one day never collide.
+
+| Tag                   | Contents                                              |
+|-----------------------|-------------------------------------------------------|
+| `2026-11-14-01-amd64` | amd64 image only                                      |
+| `2026-11-14-01-arm64` | arm64 image only                                      |
+| `2026-11-14-01`       | multi-arch manifest: pulls the right image for the host |
+| `latest`              | multi-arch manifest of the newest release             |
+| `gw-0.14.14`          | multi-arch manifest of the newest release built with graywolf 0.14.14 |
+
+`latest` and `gw-<version>` are moved to each new release. The release tag is
+permanent: the script refuses to overwrite an existing tag. The image label
+`org.opencontainers.image.revision` records the git commit of every build.
+
+Pull a specific release, or pin one in compose:
+
+```bash
+podman pull ghcr.io/kf8eez/graywolf-container:2026-11-14-01
+GRAYWOLF_TAG=2026-11-14-01 podman compose up -d
+```
+
+## Publishing a release
+
+Each architecture is built natively on its own machine (an amd64 PC and a
+Raspberry Pi 5), so no emulation is needed. Run from a clean, pushed checkout
+of the same commit on both machines.
+
+**One-time login (each machine).** The token needs the `write:packages` scope,
+and your GitHub account must be allowed to create packages in the `KF8EEZ`
+organization.
+
+```bash
+gh auth refresh -s write:packages
+gh auth token | podman login ghcr.io -u "$(gh api user -q .login)" --password-stdin
+```
+
+**1. Build and push the first architecture.** With no tag given, the script
+asks the registry for today's existing tags and uses the next serial. It prints
+the tag it chose.
+
+```bash
+scripts/publish.sh amd64            # on the PC
+```
+
+**2. Build and push the other architecture** with the same tag.
+
+```bash
+scripts/publish.sh arm64 2026-11-14-01    # on the Pi 5
+```
+
+**3. Publish the multi-arch tags,** from either machine. This checks that both
+architecture tags exist, then pushes `2026-11-14-01`, `latest` and
+`gw-<graywolf version>`.
+
+```bash
+scripts/publish.sh manifest 2026-11-14-01
+```
+
+Add `--dry-run` to any command to print what would happen without building or
+pushing. `scripts/publish.sh next` prints the next free tag.
+`IMAGE=ghcr.io/kf8eez/some-test-name scripts/publish.sh ...` publishes to a
+different package, which is useful for a trial run.
+
+## First publish
+
+New GHCR packages are private. After the first push, open the package settings
+on GitHub, link it to the repository, and change its visibility to public so
+`podman compose up` can pull it without logging in. Until the first release is
+published there is no image to pull; use `compose.build.yaml` to build locally.
