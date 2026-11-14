@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Graywolf Container",
+    "section": "",
+    "text": "Graywolf is an open-source APRS (Automatic Packet Reporting System) station for amateur radio. It combines a software modem (written in Rust, with AFSK demodulation ported from Dire Wolf), an AX.25/APRS service (written in Go) that handles beaconing, digipeating and iGate duties, and a web interface. It ships as a single binary plus a SQLite configuration database, and can talk to radios through KISS and AGWPE over TCP.\nThis project packages graywolf as a container so it can be run, moved and rebuilt with one or two podman compose commands instead of a hand-managed install."
+  },
+  {
+    "objectID": "index.html#background",
+    "href": "index.html#background",
+    "title": "Graywolf Container",
+    "section": "",
+    "text": "Graywolf is an open-source APRS (Automatic Packet Reporting System) station for amateur radio. It combines a software modem (written in Rust, with AFSK demodulation ported from Dire Wolf), an AX.25/APRS service (written in Go) that handles beaconing, digipeating and iGate duties, and a web interface. It ships as a single binary plus a SQLite configuration database, and can talk to radios through KISS and AGWPE over TCP.\nThis project packages graywolf as a container so it can be run, moved and rebuilt with one or two podman compose commands instead of a hand-managed install."
+  },
+  {
+    "objectID": "index.html#what-this-container-provides",
+    "href": "index.html#what-this-container-provides",
+    "title": "Graywolf Container",
+    "section": "What this container provides",
+    "text": "What this container provides\n\nMulti-architecture image. The same Containerfile builds for amd64 (PC, server) and arm64 (Raspberry Pi 5). It installs the official graywolf release and verifies it against the published checksums.\nTwo ways to run it:\n\nStandalone (APRS-IS only). No radio hardware; the container connects to the APRS-IS network for simple monitoring.\nWith a Digirig. A Digirig USB interface is passed into the container: its sound card for audio and its serial port for PTT (push-to-talk) via RTS/DTR.\n\nSaved run rules. Compose files capture the ports, volume and device passthrough, so nothing has to be remembered or retyped.\nPersistent data. Configuration and packet history are kept in ./graywolf-data/, outside the container, so rebuilding the image does not lose your station setup.\n\n\n\n\n\n\n\n\nFile\nPurpose\n\n\n\n\nContainerfile\nBuilds the image for amd64 or arm64\n\n\ncompose.yaml\nBase service: web UI on port 8080, no radio\n\n\ncompose.digirig.yaml\nOverlay adding Digirig audio and serial devices"
+  },
+  {
+    "objectID": "index.html#quick-start",
+    "href": "index.html#quick-start",
+    "title": "Graywolf Container",
+    "section": "Quick start",
+    "text": "Quick start\npodman compose up -d --build        # no radio, APRS-IS only\nThen open http://localhost:8080 to configure graywolf.\nFor the Digirig overlay, host group requirements and troubleshooting, see Building and running."
+  },
+  {
+    "objectID": "usage.html",
+    "href": "usage.html",
+    "title": "Building and running",
+    "section": "",
+    "text": "The Containerfile downloads the official graywolf release tarball for the target architecture (amd64 or arm64, e.g. Raspberry Pi 5), verifies its SHA-256 against the release checksums.txt, and installs it on debian:trixie-slim. The version is the GRAYWOLF_VERSION build arg (default 0.14.14, also set in compose.yaml).\nState (config DB, packet history, map tiles) lives in ./graywolf-data/ (bind-mounted at /data with :U so podman chowns it to the container user). It is git-ignored; back it up to keep your station config. The web UI listens on port 8080."
+  },
+  {
+    "objectID": "usage.html#image",
+    "href": "usage.html#image",
+    "title": "Building and running",
+    "section": "",
+    "text": "The Containerfile downloads the official graywolf release tarball for the target architecture (amd64 or arm64, e.g. Raspberry Pi 5), verifies its SHA-256 against the release checksums.txt, and installs it on debian:trixie-slim. The version is the GRAYWOLF_VERSION build arg (default 0.14.14, also set in compose.yaml).\nState (config DB, packet history, map tiles) lives in ./graywolf-data/ (bind-mounted at /data with :U so podman chowns it to the container user). It is git-ignored; back it up to keep your station config. The web UI listens on port 8080."
+  },
+  {
+    "objectID": "usage.html#running-without-a-radio-aprs-is-only",
+    "href": "usage.html#running-without-a-radio-aprs-is-only",
+    "title": "Building and running",
+    "section": "Running without a radio (APRS-IS only)",
+    "text": "Running without a radio (APRS-IS only)\npodman compose up -d --build\nThen browse to http://localhost:8080."
+  },
+  {
+    "objectID": "usage.html#running-with-a-digirig",
+    "href": "usage.html#running-with-a-digirig",
+    "title": "Building and running",
+    "section": "Running with a Digirig",
+    "text": "Running with a Digirig\npodman compose -f compose.yaml -f compose.digirig.yaml up -d --build\ncompose.digirig.yaml passes /dev/snd (Digirig audio) and the CP210x serial port (PTT via RTS/DTR) into the container. Plug the Digirig in first; a missing device stops the container from starting.\n\nUse the podman-compose provider. If podman compose hands off to docker-compose, startup fails with Unable to find group keep-groups, because docker-compose goes through podman’s Docker API, which treats keep-groups as a literal group name. Select the right provider with export PODMAN_COMPOSE_PROVIDER=/usr/bin/podman-compose, or permanently:\n# ~/.config/containers/containers.conf\n[engine]\ncompose_providers = [\"/usr/bin/podman-compose\"]\nSerial port other than /dev/ttyUSB0: DIGIRIG_SERIAL=/dev/ttyUSB1 podman compose -f compose.yaml -f compose.digirig.yaml up -d\nRootless podman needs your host user in the audio and dialout groups (sudo usermod -aG audio,dialout $USER, then log in again). The overlay uses group_add: keep-groups so the container user inherits them.\nIn the graywolf UI, select the Digirig sound device and serial PTT (RTS)."
+  },
+  {
+    "objectID": "usage.html#building-for-another-architecture",
+    "href": "usage.html#building-for-another-architecture",
+    "title": "Building and running",
+    "section": "Building for another architecture",
+    "text": "Building for another architecture\npodman build --platform linux/arm64 -t graywolf:arm64 .\nThis needs QEMU binfmt emulation on the build host; on the Pi itself a plain podman compose build builds natively."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "This site documents the container packaging for graywolf, the APRS software by Chris Snell. The container files and these docs live in the graywolf-container repository; graywolf itself is developed upstream.\n\nHome: background and overview\nBuilding and running: build, run, and Digirig setup"
+  }
+]
