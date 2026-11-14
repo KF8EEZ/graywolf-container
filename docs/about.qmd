@@ -2,4 +2,10 @@
 title: "About"
 ---
 
-About this site
+This site documents the container packaging for
+[graywolf](https://github.com/chrissnell/graywolf), the APRS software by
+Chris Snell. The container files and these docs live in the
+`graywolf-container` repository; graywolf itself is developed upstream.
+
+- [Home](index.qmd): background and overview
+- [Building and running](usage.qmd): build, run, and Digirig setup

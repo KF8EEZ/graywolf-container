@@ -2,6 +2,49 @@
 title: "Graywolf Container"
 ---
 
-This is a Quarto website.
+## Background
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+[Graywolf](https://github.com/chrissnell/graywolf) is an open-source APRS
+(Automatic Packet Reporting System) station for amateur radio. It combines a
+software modem (written in Rust, with AFSK demodulation ported from Dire Wolf),
+an AX.25/APRS service (written in Go) that handles beaconing, digipeating and
+iGate duties, and a web interface. It ships as a single binary plus a SQLite
+configuration database, and can talk to radios through KISS and AGWPE over TCP.
+
+This project packages graywolf as a container so it can be run, moved and
+rebuilt with one or two `podman compose` commands instead of a hand-managed
+install.
+
+## What this container provides
+
+- **Multi-architecture image.** The same `Containerfile` builds for `amd64`
+  (PC, server) and `arm64` (Raspberry Pi 5). It installs the official graywolf
+  release and verifies it against the published checksums.
+- **Two ways to run it:**
+  - **Standalone (APRS-IS only).** No radio hardware; the container connects
+    to the APRS-IS network for simple monitoring.
+  - **With a Digirig.** A [Digirig](https://digirig.net) USB interface is
+    passed into the container: its sound card for audio and its serial port for
+    PTT (push-to-talk) via RTS/DTR.
+- **Saved run rules.** Compose files capture the ports, volume and device
+  passthrough, so nothing has to be remembered or retyped.
+- **Persistent data.** Configuration and packet history are kept in
+  `./graywolf-data/`, outside the container, so rebuilding the image does not
+  lose your station setup.
+
+| File                   | Purpose                                         |
+|------------------------|-------------------------------------------------|
+| `Containerfile`        | Builds the image for amd64 or arm64             |
+| `compose.yaml`         | Base service: web UI on port 8080, no radio     |
+| `compose.digirig.yaml` | Overlay adding Digirig audio and serial devices |
+
+## Quick start
+
+```bash
+podman compose up -d --build        # no radio, APRS-IS only
+```
+
+Then open <http://localhost:8080> to configure graywolf.
+
+For the Digirig overlay, host group requirements and troubleshooting, see
+[Building and running](usage.qmd).
