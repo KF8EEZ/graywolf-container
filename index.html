@@ -136,6 +136,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Building and running</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./releases.html"> 
+<span class="menu-text">Releases</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -197,6 +201,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Standalone (APRS-IS only).</strong> No radio hardware; the container connects to the APRS-IS network for simple monitoring.</li>
 <li><strong>With a Digirig.</strong> A <a href="https://digirig.net">Digirig</a> USB interface is passed into the container: its sound card for audio and its serial port for PTT (push-to-talk) via RTS/DTR.</li>
 </ul></li>
+<li><strong>Published images.</strong> Multi-arch images are published to <code>ghcr.io</code> with date-based tags such as <code>2026-11-14-01</code>; see <a href="./releases.html">Releases</a>.</li>
 <li><strong>Saved run rules.</strong> Compose files capture the ports, volume and device passthrough, so nothing has to be remembered or retyped.</li>
 <li><strong>Persistent data.</strong> Configuration and packet history are kept in <code>./graywolf-data/</code>, outside the container, so rebuilding the image does not lose your station setup.</li>
 </ul>
@@ -221,6 +226,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Base service: web UI on port 8080, no radio</td>
 </tr>
 <tr class="odd">
+<td><code>compose.build.yaml</code></td>
+<td>Overlay: build locally instead of pulling</td>
+</tr>
+<tr class="even">
 <td><code>compose.digirig.yaml</code></td>
 <td>Overlay adding Digirig audio and serial devices</td>
 </tr>
@@ -229,7 +238,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="quick-start" class="level2">
 <h2 class="anchored" data-anchor-id="quick-start">Quick start</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">podman</span> compose up <span class="at">-d</span> <span class="at">--build</span>        <span class="co"># no radio, APRS-IS only</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">podman</span> compose up <span class="at">-d</span>        <span class="co"># no radio, APRS-IS only</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Then open <a href="http://localhost:8080" class="uri">http://localhost:8080</a> to configure graywolf.</p>
 <p>For the Digirig overlay, host group requirements and troubleshooting, see <a href="./usage.html">Building and running</a>.</p>
 

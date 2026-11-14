@@ -136,6 +136,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Building and running</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./releases.html"> 
+<span class="menu-text">Releases</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -158,7 +162,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#image" id="toc-image" class="nav-link active" data-scroll-target="#image">Image</a></li>
   <li><a href="#running-without-a-radio-aprs-is-only" id="toc-running-without-a-radio-aprs-is-only" class="nav-link" data-scroll-target="#running-without-a-radio-aprs-is-only">Running without a radio (APRS-IS only)</a></li>
   <li><a href="#running-with-a-digirig" id="toc-running-with-a-digirig" class="nav-link" data-scroll-target="#running-with-a-digirig">Running with a Digirig</a></li>
-  <li><a href="#building-for-another-architecture" id="toc-building-for-another-architecture" class="nav-link" data-scroll-target="#building-for-another-architecture">Building for another architecture</a></li>
+  <li><a href="#building-locally-instead-of-pulling" id="toc-building-locally-instead-of-pulling" class="nav-link" data-scroll-target="#building-locally-instead-of-pulling">Building locally instead of pulling</a></li>
   </ul>
 </nav>
     </div>
@@ -186,17 +190,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="image" class="level2">
 <h2 class="anchored" data-anchor-id="image">Image</h2>
+<p><code>compose.yaml</code> pulls the published multi-arch image <code>ghcr.io/kf8eez/graywolf-container:latest</code> (see <a href="./releases.html">Releases</a>); podman picks the <code>amd64</code> or <code>arm64</code> build for the host. The sections below describe how that image is built.</p>
 <p>The <code>Containerfile</code> downloads the official graywolf release tarball for the target architecture (<code>amd64</code> or <code>arm64</code>, e.g.&nbsp;Raspberry Pi 5), verifies its SHA-256 against the release <code>checksums.txt</code>, and installs it on <code>debian:trixie-slim</code>. The version is the <code>GRAYWOLF_VERSION</code> build arg (default <code>0.14.14</code>, also set in <code>compose.yaml</code>).</p>
 <p>State (config DB, packet history, map tiles) lives in <code>./graywolf-data/</code> (bind-mounted at <code>/data</code> with <code>:U</code> so podman chowns it to the container user). It is git-ignored; back it up to keep your station config. The web UI listens on port 8080.</p>
 </section>
 <section id="running-without-a-radio-aprs-is-only" class="level2">
 <h2 class="anchored" data-anchor-id="running-without-a-radio-aprs-is-only">Running without a radio (APRS-IS only)</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">podman</span> compose up <span class="at">-d</span> <span class="at">--build</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">podman</span> compose up <span class="at">-d</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Then browse to <a href="http://localhost:8080" class="uri">http://localhost:8080</a>.</p>
 </section>
 <section id="running-with-a-digirig" class="level2">
 <h2 class="anchored" data-anchor-id="running-with-a-digirig">Running with a Digirig</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">podman</span> compose <span class="at">-f</span> compose.yaml <span class="at">-f</span> compose.digirig.yaml up <span class="at">-d</span> <span class="at">--build</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">podman</span> compose <span class="at">-f</span> compose.yaml <span class="at">-f</span> compose.digirig.yaml up <span class="at">-d</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>compose.digirig.yaml</code> passes <code>/dev/snd</code> (Digirig audio) and the CP210x serial port (PTT via RTS/DTR) into the container. Plug the Digirig in first; a missing device stops the container from starting.</p>
 <ul>
 <li><p><strong>Use the <code>podman-compose</code> provider.</strong> If <code>podman compose</code> hands off to <code>docker-compose</code>, startup fails with <code>Unable to find group keep-groups</code>, because <code>docker-compose</code> goes through podman’s Docker API, which treats <code>keep-groups</code> as a literal group name. Select the right provider with <code>export PODMAN_COMPOSE_PROVIDER=/usr/bin/podman-compose</code>, or permanently:</p>
@@ -208,10 +213,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>In the graywolf UI, select the Digirig sound device and serial PTT (RTS).</p></li>
 </ul>
 </section>
-<section id="building-for-another-architecture" class="level2">
-<h2 class="anchored" data-anchor-id="building-for-another-architecture">Building for another architecture</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">podman</span> build <span class="at">--platform</span> linux/arm64 <span class="at">-t</span> graywolf:arm64 .</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>This needs QEMU binfmt emulation on the build host; on the Pi itself a plain <code>podman compose build</code> builds natively.</p>
+<section id="building-locally-instead-of-pulling" class="level2">
+<h2 class="anchored" data-anchor-id="building-locally-instead-of-pulling">Building locally instead of pulling</h2>
+<p>Layer <code>compose.build.yaml</code> to build the image from the <code>Containerfile</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">podman</span> compose <span class="at">-f</span> compose.yaml <span class="at">-f</span> compose.build.yaml up <span class="at">-d</span> <span class="at">--build</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Add <code>-f compose.digirig.yaml</code> for a Digirig. This builds natively for the machine it runs on (amd64 or arm64). Cross-building another architecture needs QEMU binfmt emulation, so published releases are built on each architecture’s own hardware instead.</p>
 
 
 </section>

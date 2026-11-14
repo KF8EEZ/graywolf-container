@@ -18,49 +18,77 @@
     "href": "index.html#what-this-container-provides",
     "title": "Graywolf Container",
     "section": "What this container provides",
-    "text": "What this container provides\n\nMulti-architecture image. The same Containerfile builds for amd64 (PC, server) and arm64 (Raspberry Pi 5). It installs the official graywolf release and verifies it against the published checksums.\nTwo ways to run it:\n\nStandalone (APRS-IS only). No radio hardware; the container connects to the APRS-IS network for simple monitoring.\nWith a Digirig. A Digirig USB interface is passed into the container: its sound card for audio and its serial port for PTT (push-to-talk) via RTS/DTR.\n\nSaved run rules. Compose files capture the ports, volume and device passthrough, so nothing has to be remembered or retyped.\nPersistent data. Configuration and packet history are kept in ./graywolf-data/, outside the container, so rebuilding the image does not lose your station setup.\n\n\n\n\n\n\n\n\nFile\nPurpose\n\n\n\n\nContainerfile\nBuilds the image for amd64 or arm64\n\n\ncompose.yaml\nBase service: web UI on port 8080, no radio\n\n\ncompose.digirig.yaml\nOverlay adding Digirig audio and serial devices"
+    "text": "What this container provides\n\nMulti-architecture image. The same Containerfile builds for amd64 (PC, server) and arm64 (Raspberry Pi 5). It installs the official graywolf release and verifies it against the published checksums.\nTwo ways to run it:\n\nStandalone (APRS-IS only). No radio hardware; the container connects to the APRS-IS network for simple monitoring.\nWith a Digirig. A Digirig USB interface is passed into the container: its sound card for audio and its serial port for PTT (push-to-talk) via RTS/DTR.\n\nPublished images. Multi-arch images are published to ghcr.io with date-based tags such as 2026-11-14-01; see Releases.\nSaved run rules. Compose files capture the ports, volume and device passthrough, so nothing has to be remembered or retyped.\nPersistent data. Configuration and packet history are kept in ./graywolf-data/, outside the container, so rebuilding the image does not lose your station setup.\n\n\n\n\n\n\n\n\nFile\nPurpose\n\n\n\n\nContainerfile\nBuilds the image for amd64 or arm64\n\n\ncompose.yaml\nBase service: web UI on port 8080, no radio\n\n\ncompose.build.yaml\nOverlay: build locally instead of pulling\n\n\ncompose.digirig.yaml\nOverlay adding Digirig audio and serial devices"
   },
   {
     "objectID": "index.html#quick-start",
     "href": "index.html#quick-start",
     "title": "Graywolf Container",
     "section": "Quick start",
-    "text": "Quick start\npodman compose up -d --build        # no radio, APRS-IS only\nThen open http://localhost:8080 to configure graywolf.\nFor the Digirig overlay, host group requirements and troubleshooting, see Building and running."
+    "text": "Quick start\npodman compose up -d        # no radio, APRS-IS only\nThen open http://localhost:8080 to configure graywolf.\nFor the Digirig overlay, host group requirements and troubleshooting, see Building and running."
   },
   {
     "objectID": "usage.html",
     "href": "usage.html",
     "title": "Building and running",
     "section": "",
-    "text": "The Containerfile downloads the official graywolf release tarball for the target architecture (amd64 or arm64, e.g. Raspberry Pi 5), verifies its SHA-256 against the release checksums.txt, and installs it on debian:trixie-slim. The version is the GRAYWOLF_VERSION build arg (default 0.14.14, also set in compose.yaml).\nState (config DB, packet history, map tiles) lives in ./graywolf-data/ (bind-mounted at /data with :U so podman chowns it to the container user). It is git-ignored; back it up to keep your station config. The web UI listens on port 8080."
+    "text": "compose.yaml pulls the published multi-arch image ghcr.io/kf8eez/graywolf-container:latest (see Releases); podman picks the amd64 or arm64 build for the host. The sections below describe how that image is built.\nThe Containerfile downloads the official graywolf release tarball for the target architecture (amd64 or arm64, e.g. Raspberry Pi 5), verifies its SHA-256 against the release checksums.txt, and installs it on debian:trixie-slim. The version is the GRAYWOLF_VERSION build arg (default 0.14.14, also set in compose.yaml).\nState (config DB, packet history, map tiles) lives in ./graywolf-data/ (bind-mounted at /data with :U so podman chowns it to the container user). It is git-ignored; back it up to keep your station config. The web UI listens on port 8080."
   },
   {
     "objectID": "usage.html#image",
     "href": "usage.html#image",
     "title": "Building and running",
     "section": "",
-    "text": "The Containerfile downloads the official graywolf release tarball for the target architecture (amd64 or arm64, e.g. Raspberry Pi 5), verifies its SHA-256 against the release checksums.txt, and installs it on debian:trixie-slim. The version is the GRAYWOLF_VERSION build arg (default 0.14.14, also set in compose.yaml).\nState (config DB, packet history, map tiles) lives in ./graywolf-data/ (bind-mounted at /data with :U so podman chowns it to the container user). It is git-ignored; back it up to keep your station config. The web UI listens on port 8080."
+    "text": "compose.yaml pulls the published multi-arch image ghcr.io/kf8eez/graywolf-container:latest (see Releases); podman picks the amd64 or arm64 build for the host. The sections below describe how that image is built.\nThe Containerfile downloads the official graywolf release tarball for the target architecture (amd64 or arm64, e.g. Raspberry Pi 5), verifies its SHA-256 against the release checksums.txt, and installs it on debian:trixie-slim. The version is the GRAYWOLF_VERSION build arg (default 0.14.14, also set in compose.yaml).\nState (config DB, packet history, map tiles) lives in ./graywolf-data/ (bind-mounted at /data with :U so podman chowns it to the container user). It is git-ignored; back it up to keep your station config. The web UI listens on port 8080."
   },
   {
     "objectID": "usage.html#running-without-a-radio-aprs-is-only",
     "href": "usage.html#running-without-a-radio-aprs-is-only",
     "title": "Building and running",
     "section": "Running without a radio (APRS-IS only)",
-    "text": "Running without a radio (APRS-IS only)\npodman compose up -d --build\nThen browse to http://localhost:8080."
+    "text": "Running without a radio (APRS-IS only)\npodman compose up -d\nThen browse to http://localhost:8080."
   },
   {
     "objectID": "usage.html#running-with-a-digirig",
     "href": "usage.html#running-with-a-digirig",
     "title": "Building and running",
     "section": "Running with a Digirig",
-    "text": "Running with a Digirig\npodman compose -f compose.yaml -f compose.digirig.yaml up -d --build\ncompose.digirig.yaml passes /dev/snd (Digirig audio) and the CP210x serial port (PTT via RTS/DTR) into the container. Plug the Digirig in first; a missing device stops the container from starting.\n\nUse the podman-compose provider. If podman compose hands off to docker-compose, startup fails with Unable to find group keep-groups, because docker-compose goes through podman’s Docker API, which treats keep-groups as a literal group name. Select the right provider with export PODMAN_COMPOSE_PROVIDER=/usr/bin/podman-compose, or permanently:\n# ~/.config/containers/containers.conf\n[engine]\ncompose_providers = [\"/usr/bin/podman-compose\"]\nSerial port other than /dev/ttyUSB0: DIGIRIG_SERIAL=/dev/ttyUSB1 podman compose -f compose.yaml -f compose.digirig.yaml up -d\nRootless podman needs your host user in the audio and dialout groups (sudo usermod -aG audio,dialout $USER, then log in again). The overlay uses group_add: keep-groups so the container user inherits them.\nIn the graywolf UI, select the Digirig sound device and serial PTT (RTS)."
+    "text": "Running with a Digirig\npodman compose -f compose.yaml -f compose.digirig.yaml up -d\ncompose.digirig.yaml passes /dev/snd (Digirig audio) and the CP210x serial port (PTT via RTS/DTR) into the container. Plug the Digirig in first; a missing device stops the container from starting.\n\nUse the podman-compose provider. If podman compose hands off to docker-compose, startup fails with Unable to find group keep-groups, because docker-compose goes through podman’s Docker API, which treats keep-groups as a literal group name. Select the right provider with export PODMAN_COMPOSE_PROVIDER=/usr/bin/podman-compose, or permanently:\n# ~/.config/containers/containers.conf\n[engine]\ncompose_providers = [\"/usr/bin/podman-compose\"]\nSerial port other than /dev/ttyUSB0: DIGIRIG_SERIAL=/dev/ttyUSB1 podman compose -f compose.yaml -f compose.digirig.yaml up -d\nRootless podman needs your host user in the audio and dialout groups (sudo usermod -aG audio,dialout $USER, then log in again). The overlay uses group_add: keep-groups so the container user inherits them.\nIn the graywolf UI, select the Digirig sound device and serial PTT (RTS)."
   },
   {
-    "objectID": "usage.html#building-for-another-architecture",
-    "href": "usage.html#building-for-another-architecture",
+    "objectID": "usage.html#building-locally-instead-of-pulling",
+    "href": "usage.html#building-locally-instead-of-pulling",
     "title": "Building and running",
-    "section": "Building for another architecture",
-    "text": "Building for another architecture\npodman build --platform linux/arm64 -t graywolf:arm64 .\nThis needs QEMU binfmt emulation on the build host; on the Pi itself a plain podman compose build builds natively."
+    "section": "Building locally instead of pulling",
+    "text": "Building locally instead of pulling\nLayer compose.build.yaml to build the image from the Containerfile:\npodman compose -f compose.yaml -f compose.build.yaml up -d --build\nAdd -f compose.digirig.yaml for a Digirig. This builds natively for the machine it runs on (amd64 or arm64). Cross-building another architecture needs QEMU binfmt emulation, so published releases are built on each architecture’s own hardware instead."
+  },
+  {
+    "objectID": "releases.html",
+    "href": "releases.html",
+    "title": "Releases",
+    "section": "",
+    "text": "Images are published to the GitHub Container Registry as ghcr.io/kf8eez/graywolf-container (GHCR requires a lowercase name). Releases are made with scripts/publish.sh."
+  },
+  {
+    "objectID": "releases.html#tags",
+    "href": "releases.html#tags",
+    "title": "Releases",
+    "section": "Tags",
+    "text": "Tags\nA release is named YYYY-MM-DD-NN, where NN is a serial number for that day (01, 02, …), so several releases on one day never collide.\n\n\n\n\n\n\n\nTag\nContents\n\n\n\n\n2026-11-14-01-amd64\namd64 image only\n\n\n2026-11-14-01-arm64\narm64 image only\n\n\n2026-11-14-01\nmulti-arch manifest: pulls the right image for the host\n\n\nlatest\nmulti-arch manifest of the newest release\n\n\ngw-0.14.14\nmulti-arch manifest of the newest release built with graywolf 0.14.14\n\n\n\nlatest and gw-&lt;version&gt; are moved to each new release. The release tag is permanent: the script refuses to overwrite an existing tag. The image label org.opencontainers.image.revision records the git commit of every build.\nPull a specific release, or pin one in compose:\npodman pull ghcr.io/kf8eez/graywolf-container:2026-11-14-01\nGRAYWOLF_TAG=2026-11-14-01 podman compose up -d"
+  },
+  {
+    "objectID": "releases.html#publishing-a-release",
+    "href": "releases.html#publishing-a-release",
+    "title": "Releases",
+    "section": "Publishing a release",
+    "text": "Publishing a release\nEach architecture is built natively on its own machine (an amd64 PC and a Raspberry Pi 5), so no emulation is needed. Run from a clean, pushed checkout of the same commit on both machines.\nOne-time login (each machine). The token needs the write:packages scope, and your GitHub account must be allowed to create packages in the KF8EEZ organization.\ngh auth refresh -s write:packages\ngh auth token | podman login ghcr.io -u \"$(gh api user -q .login)\" --password-stdin\n1. Build and push the first architecture. With no tag given, the script asks the registry for today’s existing tags and uses the next serial. It prints the tag it chose.\nscripts/publish.sh amd64            # on the PC\n2. Build and push the other architecture with the same tag.\nscripts/publish.sh arm64 2026-11-14-01    # on the Pi 5\n3. Publish the multi-arch tags, from either machine. This checks that both architecture tags exist, then pushes 2026-11-14-01, latest and gw-&lt;graywolf version&gt;.\nscripts/publish.sh manifest 2026-11-14-01\nAdd --dry-run to any command to print what would happen without building or pushing. scripts/publish.sh next prints the next free tag. IMAGE=ghcr.io/kf8eez/some-test-name scripts/publish.sh ... publishes to a different package, which is useful for a trial run."
+  },
+  {
+    "objectID": "releases.html#first-publish",
+    "href": "releases.html#first-publish",
+    "title": "Releases",
+    "section": "First publish",
+    "text": "First publish\nNew GHCR packages are private. After the first push, open the package settings on GitHub, link it to the repository, and change its visibility to public so podman compose up can pull it without logging in. Until the first release is published there is no image to pull; use compose.build.yaml to build locally."
   },
   {
     "objectID": "about.html",
